@@ -9,15 +9,14 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+	Q_OBJECT
 
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+   public:
+	MainWindow(QWidget* parent = nullptr);	// 构造函数
+	~MainWindow();							// 析构函数
 
-private:
-    Ui::MainWindow *ui;
+   private:
+	Ui::MainWindow* ui;	 // UI 指针
 };
-#endif // MAINWINDOW_H
+#endif	// MAINWINDOW_H
