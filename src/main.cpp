@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "controller/mainwindow.h"
+#include "widget/mainwindow.h"
 
 // 应用程序入口点
 int main(int argc, char* argv[]) {

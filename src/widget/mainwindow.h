@@ -4,7 +4,6 @@
 #include <QListWidgetItem>
 #include <QMainWindow>
 
-#include "../repository/databasemanager.h"
 #include "../model/todoitem.h"
 
 QT_BEGIN_NAMESPACE

@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 
-#include "../repository/databasemanager.h"
+#include "../repo/databasemanager.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget* parent)

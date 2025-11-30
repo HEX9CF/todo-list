@@ -8,13 +8,13 @@ qt_standard_project_setup()
 qt_add_executable(todo-list
     WIN32 MACOSX_BUNDLE
     src/main.cpp
-    src/controller/mainwindow.cpp
-    src/controller/mainwindow.h
-    src/view/mainwindow.ui
+    src/widget/mainwindow.cpp
+    src/widget/mainwindow.h
+    src/widget/mainwindow.ui
     src/model/todoitem.cpp
     src/model/todoitem.h
-    src/repository/databasemanager.cpp
-    src/repository/databasemanager.h
+    src/repo/databasemanager.cpp
+    src/repo/databasemanager.h
 )
 
 target_link_libraries(todo-list
