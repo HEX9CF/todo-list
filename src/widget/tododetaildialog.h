@@ -16,8 +16,15 @@ class TodoDetailDialog : public QDialog {
 	explicit TodoDetailDialog(const TodoItem& item, QWidget* parent = nullptr);
 	~TodoDetailDialog();
 
+	TodoItem getTodoItem() const;
+
+   private slots:
+	void onUpdateClicked();
+	void onCancelClicked();
+
    private:
 	Ui::TodoDetailDialog* ui;
+	TodoItem m_todoItem;
 };
 
 #endif	// TODODETAILDIALOG_H

@@ -1,38 +1,51 @@
 #include "tododetaildialog.h"
 
+#include <QMessageBox>
+
 #include "ui_tododetaildialog.h"
 
 TodoDetailDialog::TodoDetailDialog(const TodoItem& item, QWidget* parent)
-	: QDialog(parent), ui(new Ui::TodoDetailDialog) {
+	: QDialog(parent), ui(new Ui::TodoDetailDialog), m_todoItem(item) {
 	ui->setupUi(this);
 
-	ui->titleLabel->setText(item.title);
-	ui->categoryLabel->setText(item.category.isEmpty() ? "无" : item.category);
-
-	QString priorityStr;
-	switch (item.priority) {
-		case 0:
-			priorityStr = "低";
-			break;
-		case 1:
-			priorityStr = "中";
-			break;
-		case 2:
-			priorityStr = "高";
-			break;
-		default:
-			priorityStr = "未知";
-	}
-	ui->priorityLabel->setText(priorityStr);
+	ui->titleInput->setText(item.title);
+	ui->categoryInput->setText(item.category);
+	ui->priorityInput->setCurrentIndex(item.priority);
 
 	if (item.deadline.isValid()) {
-		ui->deadlineLabel->setText(item.deadline.toString("yyyy-MM-dd HH:mm"));
+		ui->deadlineInput->setDateTime(item.deadline);
 	} else {
-		ui->deadlineLabel->setText("无");
+		ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
 	}
 
-	ui->statusLabel->setText(item.completed ? "已完成" : "未完成");
-	ui->descriptionBrowser->setText(item.description);
+	ui->statusInput->setChecked(item.completed);
+	ui->descriptionInput->setText(item.description);
+
+	connect(ui->updateButton, &QPushButton::clicked, this,
+			&TodoDetailDialog::onUpdateClicked);
+	connect(ui->cancelButton, &QPushButton::clicked, this,
+			&TodoDetailDialog::onCancelClicked);
 }
 
 TodoDetailDialog::~TodoDetailDialog() { delete ui; }
+
+TodoItem TodoDetailDialog::getTodoItem() const { return m_todoItem; }
+
+void TodoDetailDialog::onUpdateClicked() {
+	QString title = ui->titleInput->text().trimmed();
+	if (title.isEmpty()) {
+		QMessageBox::warning(this, "警告", "标题不能为空！");
+		return;
+	}
+
+	m_todoItem.title = title;
+	m_todoItem.category = ui->categoryInput->text().trimmed();
+	m_todoItem.priority = ui->priorityInput->currentIndex();
+	m_todoItem.deadline = ui->deadlineInput->dateTime();
+	m_todoItem.completed = ui->statusInput->isChecked();
+	m_todoItem.description = ui->descriptionInput->toPlainText().trimmed();
+
+	accept();
+}
+
+void TodoDetailDialog::onCancelClicked() { reject(); }

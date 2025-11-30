@@ -111,7 +111,15 @@ void MainWindow::onItemChanged(QTableWidgetItem* item) {
 void MainWindow::onItemDoubleClicked(int row, int column) {
 	if (row >= 0 && row < m_todoItems.size()) {
 		TodoDetailDialog dialog(m_todoItems[row], this);
-		dialog.exec();
+		if (dialog.exec() == QDialog::Accepted) {
+			TodoItem updatedItem = dialog.getTodoItem();
+			if (DatabaseManager::instance().updateTodo(updatedItem)) {
+				loadData();	 // Refresh all data
+			} else {
+				QMessageBox::warning(this, "Error",
+									 "Failed to update todo item!");
+			}
+		}
 	}
 }
 
