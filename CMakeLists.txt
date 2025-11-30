@@ -11,10 +11,13 @@ qt_add_executable(todo-list
     src/widget/mainwindow.cpp
     src/widget/mainwindow.h
     src/widget/mainwindow.ui
+    src/widget/tododialog.ui
     src/model/todoitem.cpp
     src/model/todoitem.h
     src/repo/databasemanager.cpp
     src/repo/databasemanager.h
+    src/widget/tododialog.cpp
+    src/widget/tododialog.h
 )
 
 target_link_libraries(todo-list

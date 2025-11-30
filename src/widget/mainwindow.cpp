@@ -10,7 +10,6 @@
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);	// 设置 UI 界面
-	ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
 
 	// Setup Table
 	ui->todoTableWidget->setColumnCount(6);
@@ -29,8 +28,8 @@ MainWindow::MainWindow(QWidget* parent)
 	}
 
 	// 连接信号和槽
-	connect(ui->addButton, &QPushButton::clicked, this,
-			&MainWindow::onAddClicked);
+	connect(ui->createButton, &QPushButton::clicked, this,
+			&MainWindow::onCreateClicked);
 	connect(ui->deleteButton, &QPushButton::clicked, this,
 			&MainWindow::onDeleteClicked);
 	connect(ui->todoTableWidget, &QTableWidget::itemChanged, this,
@@ -44,31 +43,16 @@ MainWindow::~MainWindow() {
 	delete ui;	// 释放 UI 内存
 }
 
-void MainWindow::onAddClicked() {
-	QString title = ui->titleInput->text().trimmed();
-	QString description = ui->descriptionInput->text().trimmed();
-	QString category = ui->categoryInput->text().trimmed();
-	int priority = ui->priorityInput->currentIndex();
-	QDateTime deadline = ui->deadlineInput->dateTime();
-
-	if (title.isEmpty()) {
-		QMessageBox::warning(this, "警告", "标题不能为空！");
-		return;
-	}
-
-	TodoItem newItem(-1, title, description, false, category, priority,
-					 deadline);
-
-	if (DatabaseManager::instance().addTodo(newItem)) {
-		m_todoItems.append(newItem);
-		ui->titleInput->clear();
-		ui->descriptionInput->clear();
-		ui->categoryInput->clear();
-		ui->priorityInput->setCurrentIndex(0);
-		ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
-		refreshTableWidget();
-	} else {
-		QMessageBox::warning(this, "Error", "Failed to add todo item!");
+void MainWindow::onCreateClicked() {
+	TodoDialog dialog(this);
+	if (dialog.exec() == QDialog::Accepted) {
+		TodoItem newItem = dialog.getTodoItem();
+		if (DatabaseManager::instance().addTodo(newItem)) {
+			m_todoItems.append(newItem);
+			refreshTableWidget();
+		} else {
+			QMessageBox::warning(this, "Error", "Failed to add todo item!");
+		}
 	}
 }
 

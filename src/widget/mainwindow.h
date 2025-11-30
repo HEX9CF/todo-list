@@ -5,6 +5,7 @@
 #include <QTableWidgetItem>
 
 #include "../model/todoitem.h"
+#include "tododialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,7 +21,7 @@ class MainWindow : public QMainWindow {
 	~MainWindow();							// 析构函数
 
    private slots:
-	void onAddClicked();
+	void onCreateClicked();
 	void onDeleteClicked();
 	void onItemChanged(QTableWidgetItem* item);
 
