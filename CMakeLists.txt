@@ -11,6 +11,8 @@ qt_add_executable(todo-list
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
+    todoitem.cpp
+    todoitem.h
 )
 
 target_link_libraries(todo-list
