@@ -8,11 +8,11 @@ qt_standard_project_setup()
 qt_add_executable(todo-list
     WIN32 MACOSX_BUNDLE
     src/main.cpp
-    src/mainwindow.cpp
-    src/mainwindow.h
-    src/mainwindow.ui
-    src/todoitem.cpp
-    src/todoitem.h
+    src/controller/mainwindow.cpp
+    src/controller/mainwindow.h
+    src/view/mainwindow.ui
+    src/model/todoitem.cpp
+    src/model/todoitem.h
 )
 
 target_link_libraries(todo-list
