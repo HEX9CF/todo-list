@@ -23,7 +23,7 @@ TodoItem TodoCreateDialog::getTodoItem() const { return m_todoItem; }
 
 void TodoCreateDialog::onOkClicked() {
 	QString title = ui->titleInput->text().trimmed();
-	QString description = ui->descriptionInput->text().trimmed();
+	QString description = ui->descriptionInput->toPlainText().trimmed();
 	QString category = ui->categoryInput->text().trimmed();
 	int priority = ui->priorityInput->currentIndex();
 	QDateTime deadline = ui->deadlineInput->dateTime();
