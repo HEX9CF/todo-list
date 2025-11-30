@@ -1,8 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QListWidgetItem>
 #include <QMainWindow>
+#include <QTableWidgetItem>
 
 #include "../model/todoitem.h"
 
@@ -22,13 +22,13 @@ class MainWindow : public QMainWindow {
    private slots:
 	void onAddClicked();
 	void onDeleteClicked();
-	void onItemChanged(QListWidgetItem* item);
+	void onItemChanged(QTableWidgetItem* item);
 
    private:
 	Ui::MainWindow* ui;	 // UI 指针
 	QList<TodoItem> m_todoItems;
 
 	void loadData();
-	void refreshListWidget();
+	void refreshTableWidget();
 };
 #endif	// MAINWINDOW_H

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 
+#include <QHeaderView>
 #include <QMessageBox>
+#include <QTableWidget>
 
 #include "../repo/databasemanager.h"
 #include "ui_mainwindow.h"
@@ -9,6 +11,15 @@ MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);	// 设置 UI 界面
 	ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
+
+	// Setup Table
+	ui->todoTableWidget->setColumnCount(6);
+	QStringList headers;
+	headers << "完成" << "标题" << "描述" << "分类" << "优先级" << "截止日期";
+	ui->todoTableWidget->setHorizontalHeaderLabels(headers);
+	ui->todoTableWidget->horizontalHeader()->setSectionResizeMode(
+		QHeaderView::Stretch);
+	ui->todoTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 	// Initialize Database
 	if (DatabaseManager::instance().openDatabase()) {
@@ -22,7 +33,7 @@ MainWindow::MainWindow(QWidget* parent)
 			&MainWindow::onAddClicked);
 	connect(ui->deleteButton, &QPushButton::clicked, this,
 			&MainWindow::onDeleteClicked);
-	connect(ui->todoListWidget, &QListWidget::itemChanged, this,
+	connect(ui->todoTableWidget, &QTableWidget::itemChanged, this,
 			&MainWindow::onItemChanged);
 
 	// 加载数据
@@ -55,24 +66,27 @@ void MainWindow::onAddClicked() {
 		ui->categoryInput->clear();
 		ui->priorityInput->setCurrentIndex(0);
 		ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
-		refreshListWidget();
+		refreshTableWidget();
 	} else {
 		QMessageBox::warning(this, "Error", "Failed to add todo item!");
 	}
 }
 
 void MainWindow::onDeleteClicked() {
-	QList<QListWidgetItem*> selectedItems = ui->todoListWidget->selectedItems();
-	if (selectedItems.isEmpty()) return;
-
-	// 从后往前删除，避免索引问题
-	QList<int> rows;
+	// Get selected rows
+	QList<QTableWidgetItem*> selectedItems =
+		ui->todoTableWidget->selectedItems();
+	QSet<int> rows;
 	for (auto item : selectedItems) {
-		rows.append(ui->todoListWidget->row(item));
+		rows.insert(item->row());
 	}
-	std::sort(rows.begin(), rows.end(), std::greater<int>());
 
-	for (int row : rows) {
+	QList<int> sortedRows = rows.values();
+	std::sort(sortedRows.begin(), sortedRows.end(), std::greater<int>());
+
+	if (sortedRows.isEmpty()) return;
+
+	for (int row : sortedRows) {
 		if (row >= 0 && row < m_todoItems.size()) {
 			int id = m_todoItems[row].id;
 			if (DatabaseManager::instance().removeTodo(id)) {
@@ -84,11 +98,14 @@ void MainWindow::onDeleteClicked() {
 		}
 	}
 
-	refreshListWidget();
+	refreshTableWidget();
 }
 
-void MainWindow::onItemChanged(QListWidgetItem* item) {
-	int row = ui->todoListWidget->row(item);
+void MainWindow::onItemChanged(QTableWidgetItem* item) {
+	// Only handle changes in the "Completed" column (index 0)
+	if (item->column() != 0) return;
+
+	int row = item->row();
 	if (row >= 0 && row < m_todoItems.size()) {
 		bool completed = (item->checkState() == Qt::Checked);
 		if (m_todoItems[row].completed != completed) {
@@ -103,40 +120,50 @@ void MainWindow::onItemChanged(QListWidgetItem* item) {
 
 void MainWindow::loadData() {
 	m_todoItems = DatabaseManager::instance().getAllTodos();
-	refreshListWidget();
+	refreshTableWidget();
 }
 
-void MainWindow::refreshListWidget() {
+void MainWindow::refreshTableWidget() {
 	// 暂时断开信号，防止在添加 item 时触发 itemChanged
-	ui->todoListWidget->blockSignals(true);
+	ui->todoTableWidget->blockSignals(true);
 
-	ui->todoListWidget->clear();
-	for (const auto& item : m_todoItems) {
-		QString label = "";
-		if (!item.category.isEmpty()) {
-			label += " [" + item.category + "]";
-		}
-		if (!item.title.isEmpty()) {
-			label += " " + item.title;
-		}
-		if (!item.description.isEmpty()) {
-			label += " - " + item.description;
-		}
+	ui->todoTableWidget->setRowCount(0);  // Clear table
+
+	for (int i = 0; i < m_todoItems.size(); ++i) {
+		const auto& item = m_todoItems[i];
+		ui->todoTableWidget->insertRow(i);
+
+		// Column 0: Completed (Checkbox)
+		QTableWidgetItem* checkItem = new QTableWidgetItem();
+		checkItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled |
+							Qt::ItemIsSelectable);
+		checkItem->setCheckState(item.completed ? Qt::Checked : Qt::Unchecked);
+		// Store ID in the first column item for reference if needed, though we
+		// use row index
+		checkItem->setData(Qt::UserRole, item.id);
+		ui->todoTableWidget->setItem(i, 0, checkItem);
+
+		// Column 1: Title
+		ui->todoTableWidget->setItem(i, 1, new QTableWidgetItem(item.title));
+
+		// Column 2: Description
+		ui->todoTableWidget->setItem(i, 2,
+									 new QTableWidgetItem(item.description));
+
+		// Column 3: Category
+		ui->todoTableWidget->setItem(i, 3, new QTableWidgetItem(item.category));
+
+		// Column 4: Priority
 		QString priorityStr =
 			(item.priority == 0) ? "低" : (item.priority == 1 ? "中" : "高");
-		label += " (优先级: " + priorityStr + ")";
-		if (item.deadline.isValid()) {
-			label += " " + item.deadline.toString("yyyy-MM-dd HH:mm");
-		}
+		ui->todoTableWidget->setItem(i, 4, new QTableWidgetItem(priorityStr));
 
-		QListWidgetItem* widgetItem = new QListWidgetItem(label);
-
-		widgetItem->setFlags(widgetItem->flags() | Qt::ItemIsUserCheckable);
-		widgetItem->setCheckState(item.completed ? Qt::Checked : Qt::Unchecked);
-		widgetItem->setData(Qt::UserRole, item.id);
-
-		ui->todoListWidget->addItem(widgetItem);
+		// Column 5: Deadline
+		QString deadlineStr = item.deadline.isValid()
+								  ? item.deadline.toString("yyyy-MM-dd HH:mm")
+								  : "";
+		ui->todoTableWidget->setItem(i, 5, new QTableWidgetItem(deadlineStr));
 	}
 
-	ui->todoListWidget->blockSignals(false);
+	ui->todoTableWidget->blockSignals(false);
 }
