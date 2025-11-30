@@ -4,7 +4,8 @@
 #include <QListWidgetItem>
 #include <QMainWindow>
 
-#include "todoitem.h"
+#include "../repository/databasemanager.h"
+#include "../model/todoitem.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,10 +28,8 @@ class MainWindow : public QMainWindow {
    private:
 	Ui::MainWindow* ui;	 // UI 指针
 	QList<TodoItem> m_todoItems;
-	const QString m_filename = "todo_list_data.json";
 
 	void loadData();
-	void saveData();
 	void refreshListWidget();
 };
 #endif	// MAINWINDOW_H

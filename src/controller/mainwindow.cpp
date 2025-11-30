@@ -1,15 +1,20 @@
 #include "mainwindow.h"
 
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
 #include <QMessageBox>
 
+#include "../repository/databasemanager.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);	// 设置 UI 界面
+
+	// Initialize Database
+	if (DatabaseManager::instance().openDatabase()) {
+		DatabaseManager::instance().initTable();
+	} else {
+		QMessageBox::critical(this, "Error", "Failed to open database!");
+	}
 
 	// 连接信号和槽
 	connect(ui->addButton, &QPushButton::clicked, this,
@@ -36,14 +41,16 @@ void MainWindow::onAddClicked() {
 		return;
 	}
 
-	TodoItem newItem(title, description, false);
-	m_todoItems.append(newItem);
+	TodoItem newItem(-1, title, description, false);
 
-	ui->titleInput->clear();
-	ui->descriptionInput->clear();
-
-	refreshListWidget();
-	saveData();
+	if (DatabaseManager::instance().addTodo(newItem)) {
+		m_todoItems.append(newItem);
+		ui->titleInput->clear();
+		ui->descriptionInput->clear();
+		refreshListWidget();
+	} else {
+		QMessageBox::warning(this, "Error", "Failed to add todo item!");
+	}
 }
 
 void MainWindow::onDeleteClicked() {
@@ -59,52 +66,36 @@ void MainWindow::onDeleteClicked() {
 
 	for (int row : rows) {
 		if (row >= 0 && row < m_todoItems.size()) {
-			m_todoItems.removeAt(row);
+			int id = m_todoItems[row].id;
+			if (DatabaseManager::instance().removeTodo(id)) {
+				m_todoItems.removeAt(row);
+			} else {
+				QMessageBox::warning(this, "Error",
+									 "Failed to delete todo item!");
+			}
 		}
 	}
 
 	refreshListWidget();
-	saveData();
 }
 
 void MainWindow::onItemChanged(QListWidgetItem* item) {
 	int row = ui->todoListWidget->row(item);
 	if (row >= 0 && row < m_todoItems.size()) {
 		bool completed = (item->checkState() == Qt::Checked);
-		m_todoItems[row].completed = completed;
-		saveData();
+		if (m_todoItems[row].completed != completed) {
+			m_todoItems[row].completed = completed;
+			if (!DatabaseManager::instance().updateTodo(m_todoItems[row])) {
+				QMessageBox::warning(this, "Error",
+									 "Failed to update todo item!");
+			}
+		}
 	}
 }
 
 void MainWindow::loadData() {
-	QFile file(m_filename);
-	if (!file.open(QIODevice::ReadOnly)) {
-		return;	 // 文件不存在或无法打开，可能是第一次运行
-	}
-
-	QByteArray data = file.readAll();
-	QJsonDocument doc = QJsonDocument::fromJson(data);
-	QJsonArray array = doc.array();
-
-	m_todoItems.clear();
-	for (const auto& value : array) {
-		m_todoItems.append(TodoItem::fromJson(value.toObject()));
-	}
-
+	m_todoItems = DatabaseManager::instance().getAllTodos();
 	refreshListWidget();
-}
-
-void MainWindow::saveData() {
-	QJsonArray array;
-	for (const auto& item : m_todoItems) {
-		array.append(item.toJson());
-	}
-
-	QJsonDocument doc(array);
-	QFile file(m_filename);
-	if (file.open(QIODevice::WriteOnly)) {
-		file.write(doc.toJson());
-	}
 }
 
 void MainWindow::refreshListWidget() {
@@ -121,6 +112,7 @@ void MainWindow::refreshListWidget() {
 		QListWidgetItem* widgetItem = new QListWidgetItem(label);
 		widgetItem->setFlags(widgetItem->flags() | Qt::ItemIsUserCheckable);
 		widgetItem->setCheckState(item.completed ? Qt::Checked : Qt::Unchecked);
+		widgetItem->setData(Qt::UserRole, item.id);
 
 		ui->todoListWidget->addItem(widgetItem);
 	}
