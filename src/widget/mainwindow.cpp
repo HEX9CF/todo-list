@@ -371,27 +371,28 @@ void MainWindow::refreshTableWidget() {
 			if (item.deadline.isValid() && item.deadline < currentDateTime)
 				continue;
 		} else if (m_expiredFilterIndex == 2) {
-			// 今年过期
-			if (!item.deadline.isValid() ||
+			// 今年过期 (且未过期)
+			if (!item.deadline.isValid() || item.deadline < currentDateTime ||
 				item.deadline.date().year() != currentDateTime.date().year())
 				continue;
 		} else if (m_expiredFilterIndex == 3) {
-			// 本月过期
-			if (!item.deadline.isValid() ||
+			// 本月过期 (且未过期)
+			if (!item.deadline.isValid() || item.deadline < currentDateTime ||
 				item.deadline.date().year() != currentDateTime.date().year() ||
 				item.deadline.date().month() != currentDateTime.date().month())
 				continue;
 		} else if (m_expiredFilterIndex == 4) {
-			// 本周过期
-			if (!item.deadline.isValid()) continue;
+			// 本周过期 (且未过期)
+			if (!item.deadline.isValid() || item.deadline < currentDateTime)
+				continue;
 			int itemYear = 0;
 			int itemWeek = item.deadline.date().weekNumber(&itemYear);
 			int currentYear = 0;
 			int currentWeek = currentDateTime.date().weekNumber(&currentYear);
 			if (itemYear != currentYear || itemWeek != currentWeek) continue;
 		} else if (m_expiredFilterIndex == 5) {
-			// 今天过期
-			if (!item.deadline.isValid() ||
+			// 今天过期 (且未过期)
+			if (!item.deadline.isValid() || item.deadline < currentDateTime ||
 				item.deadline.date() != currentDateTime.date())
 				continue;
 		} else if (m_expiredFilterIndex == 6) {
