@@ -1,11 +1,11 @@
-#include "tododetaildialog.h"
+#include "taskdetaildialog.h"
 
 #include <QMessageBox>
 
-#include "ui_tododetaildialog.h"
+#include "ui_taskdetaildialog.h"
 
-TodoDetailDialog::TodoDetailDialog(const TodoItem& item, QWidget* parent)
-	: QDialog(parent), ui(new Ui::TodoDetailDialog), m_todoItem(item) {
+TaskDetailDialog::TaskDetailDialog(const TaskItem& item, QWidget* parent)
+	: QDialog(parent), ui(new Ui::TaskDetailDialog), m_todoItem(item) {
 	ui->setupUi(this);
 
 	ui->titleInput->setText(item.title);
@@ -22,16 +22,16 @@ TodoDetailDialog::TodoDetailDialog(const TodoItem& item, QWidget* parent)
 	ui->descriptionInput->setText(item.description);
 
 	connect(ui->updateButton, &QPushButton::clicked, this,
-			&TodoDetailDialog::onUpdateClicked);
+			&TaskDetailDialog::onUpdateClicked);
 	connect(ui->cancelButton, &QPushButton::clicked, this,
-			&TodoDetailDialog::onCancelClicked);
+			&TaskDetailDialog::onCancelClicked);
 }
 
-TodoDetailDialog::~TodoDetailDialog() { delete ui; }
+TaskDetailDialog::~TaskDetailDialog() { delete ui; }
 
-TodoItem TodoDetailDialog::getTodoItem() const { return m_todoItem; }
+TaskItem TaskDetailDialog::getTaskItem() const { return m_todoItem; }
 
-void TodoDetailDialog::onUpdateClicked() {
+void TaskDetailDialog::onUpdateClicked() {
 	QString title = ui->titleInput->text().trimmed();
 	if (title.isEmpty()) {
 		QMessageBox::warning(this, "警告", "标题不能为空！");
@@ -48,4 +48,4 @@ void TodoDetailDialog::onUpdateClicked() {
 	accept();
 }
 
-void TodoDetailDialog::onCancelClicked() { reject(); }
+void TaskDetailDialog::onCancelClicked() { reject(); }

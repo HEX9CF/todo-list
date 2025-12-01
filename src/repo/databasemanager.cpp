@@ -55,7 +55,7 @@ bool DatabaseManager::initTable() {
 	return query.exec(createTableQuery);
 }
 
-bool DatabaseManager::addTodo(TodoItem& item) {
+bool DatabaseManager::addTask(TaskItem& item) {
 	QSqlQuery query;
 	query.prepare(
 		"INSERT INTO todo_items (title, description, completed, category, "
@@ -78,14 +78,14 @@ bool DatabaseManager::addTodo(TodoItem& item) {
 	return false;
 }
 
-bool DatabaseManager::removeTodo(int id) {
+bool DatabaseManager::removeTask(int id) {
 	QSqlQuery query;
 	query.prepare("DELETE FROM todo_items WHERE id = :id");
 	query.bindValue(":id", id);
 	return query.exec();
 }
 
-bool DatabaseManager::updateTodo(const TodoItem& item) {
+bool DatabaseManager::updateTask(const TaskItem& item) {
 	QSqlQuery query;
 	query.prepare(
 		"UPDATE todo_items SET title = :title, description = :description, "
@@ -103,8 +103,8 @@ bool DatabaseManager::updateTodo(const TodoItem& item) {
 	return query.exec();
 }
 
-QList<TodoItem> DatabaseManager::getAllTodos() {
-	QList<TodoItem> list;
+QList<TaskItem> DatabaseManager::getAllTasks() {
+	QList<TaskItem> list;
 	QSqlQuery query(
 		"SELECT id, title, description, completed, category, priority, "
 		"deadline FROM todo_items");
@@ -117,14 +117,14 @@ QList<TodoItem> DatabaseManager::getAllTodos() {
 		int priority = query.value(5).toInt();
 		QDateTime deadline =
 			QDateTime::fromString(query.value(6).toString(), Qt::ISODate);
-		list.append(TodoItem(id, title, description, completed, category,
+		list.append(TaskItem(id, title, description, completed, category,
 							 priority, deadline));
 	}
 	return list;
 }
 
-QList<TodoItem> DatabaseManager::searchTodos(const QString& searchText) {
-	QList<TodoItem> list;
+QList<TaskItem> DatabaseManager::searchTasks(const QString& searchText) {
+	QList<TaskItem> list;
 	QSqlQuery query;
 	query.prepare(
 		"SELECT id, title, description, completed, category, priority, "
@@ -142,7 +142,7 @@ QList<TodoItem> DatabaseManager::searchTodos(const QString& searchText) {
 		int priority = query.value(5).toInt();
 		QDateTime deadline =
 			QDateTime::fromString(query.value(6).toString(), Qt::ISODate);
-		list.append(TodoItem(id, title, description, completed, category,
+		list.append(TaskItem(id, title, description, completed, category,
 							 priority, deadline));
 	}
 	return list;

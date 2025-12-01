@@ -6,8 +6,8 @@
 #include <QTableWidget>
 
 #include "../repo/databasemanager.h"
-#include "todocreatedialog.h"
-#include "tododetaildialog.h"
+#include "taskcreatedialog.h"
+#include "taskdetaildialog.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -83,10 +83,10 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::onCreateClicked() {
-	TodoCreateDialog dialog(this);
+	TaskCreateDialog dialog(this);
 	if (dialog.exec() == QDialog::Accepted) {
-		TodoItem newItem = dialog.getTodoItem();
-		if (DatabaseManager::instance().addTodo(newItem)) {
+		TaskItem newItem = dialog.getTaskItem();
+		if (DatabaseManager::instance().addTask(newItem)) {
 			m_todoItems.append(newItem);
 			refreshCategoryList();
 			refreshTableWidget();
@@ -115,7 +115,7 @@ void MainWindow::onCopyClicked() {
 		int id = idItem->data(Qt::UserRole).toInt();
 
 		// 查找原始项目
-		TodoItem originalItem;
+		TaskItem originalItem;
 		bool found = false;
 		for (const auto& item : m_todoItems) {
 			if (item.id == id) {
@@ -126,10 +126,10 @@ void MainWindow::onCopyClicked() {
 		}
 
 		if (found) {
-			TodoItem newItem = originalItem;
+			TaskItem newItem = originalItem;
 			newItem.id = -1;  // 重置 ID，以便数据库分配新 ID
 
-			if (DatabaseManager::instance().addTodo(newItem)) {
+			if (DatabaseManager::instance().addTask(newItem)) {
 				m_todoItems.append(newItem);
 			} else {
 				QMessageBox::warning(this, "错误", "复制待办事项失败！");
@@ -164,7 +164,7 @@ void MainWindow::onDeleteClicked() {
 
 		int id = idItem->data(Qt::UserRole).toInt();
 
-		if (DatabaseManager::instance().removeTodo(id)) {
+		if (DatabaseManager::instance().removeTask(id)) {
 			// 从 m_todoItems 中移除
 			for (int i = 0; i < m_todoItems.size(); ++i) {
 				if (m_todoItems[i].id == id) {
@@ -186,7 +186,7 @@ void MainWindow::onSearchClicked() {
 	if (searchText.isEmpty()) {
 		loadData();
 	} else {
-		m_todoItems = DatabaseManager::instance().searchTodos(searchText);
+		m_todoItems = DatabaseManager::instance().searchTasks(searchText);
 		onSortByChanged(ui->sortByComboBox->currentIndex());  // 应用排序
 		refreshCategoryList();
 		refreshTableWidget();
@@ -208,20 +208,20 @@ void MainWindow::onSortByChanged(int index) {
 	switch (index) {
 		case 0:	 // ID
 			std::sort(m_todoItems.begin(), m_todoItems.end(),
-					  [this](const TodoItem& a, const TodoItem& b) {
+					  [this](const TaskItem& a, const TaskItem& b) {
 						  return m_isAscending ? (a.id < b.id) : (a.id > b.id);
 					  });
 			break;
 		case 1:	 // 标题
 			std::sort(m_todoItems.begin(), m_todoItems.end(),
-					  [this](const TodoItem& a, const TodoItem& b) {
+					  [this](const TaskItem& a, const TaskItem& b) {
 						  return m_isAscending ? (a.title < b.title)
 											   : (a.title > b.title);
 					  });
 			break;
 		case 2:	 // 优先级 (从高到低: 2 > 1 > 0)
 			std::sort(m_todoItems.begin(), m_todoItems.end(),
-					  [this](const TodoItem& a, const TodoItem& b) {
+					  [this](const TaskItem& a, const TaskItem& b) {
 						  // 优先级逻辑通常是 高 > 低，所以
 						  // “升序”可能意味着 0->2 或 2->0，取决于
 						  // 解释。让我们假设升序意味着 0
@@ -232,7 +232,7 @@ void MainWindow::onSortByChanged(int index) {
 			break;
 		case 3:	 // 截止日期 (最早的在前)
 			std::sort(m_todoItems.begin(), m_todoItems.end(),
-					  [this](const TodoItem& a, const TodoItem& b) {
+					  [this](const TaskItem& a, const TaskItem& b) {
 						  if (!a.deadline.isValid())
 							  return false;	 // 无效的排在最后
 						  if (!b.deadline.isValid()) return true;
@@ -270,7 +270,7 @@ void MainWindow::onItemChanged(QTableWidgetItem* item) {
 		if (todo.id == id) {
 			if (todo.completed != completed) {
 				todo.completed = completed;
-				if (!DatabaseManager::instance().updateTodo(todo)) {
+				if (!DatabaseManager::instance().updateTask(todo)) {
 					QMessageBox::warning(this, "错误", "更新待办事项失败！");
 				}
 			}
@@ -284,7 +284,7 @@ void MainWindow::onItemDoubleClicked(int row, int column) {
 	if (!idItem) return;
 	int id = idItem->data(Qt::UserRole).toInt();
 
-	TodoItem* targetItem = nullptr;
+	TaskItem* targetItem = nullptr;
 	for (auto& item : m_todoItems) {
 		if (item.id == id) {
 			targetItem = &item;
@@ -293,10 +293,10 @@ void MainWindow::onItemDoubleClicked(int row, int column) {
 	}
 
 	if (targetItem) {
-		TodoDetailDialog dialog(*targetItem, this);
+		TaskDetailDialog dialog(*targetItem, this);
 		if (dialog.exec() == QDialog::Accepted) {
-			TodoItem updatedItem = dialog.getTodoItem();
-			if (DatabaseManager::instance().updateTodo(updatedItem)) {
+			TaskItem updatedItem = dialog.getTaskItem();
+			if (DatabaseManager::instance().updateTask(updatedItem)) {
 				loadData();	 // 刷新所有数据
 			} else {
 				QMessageBox::warning(this, "错误", "更新待办事项失败！");
@@ -316,7 +316,7 @@ void MainWindow::onExpiredFilterChanged(int index) {
 }
 
 void MainWindow::loadData() {
-	m_todoItems = DatabaseManager::instance().getAllTodos();
+	m_todoItems = DatabaseManager::instance().getAllTasks();
 	onSortByChanged(ui->sortByComboBox->currentIndex());  // 应用排序
 	refreshCategoryList();
 	refreshTableWidget();

@@ -5,7 +5,7 @@
 #include <QJsonObject>
 #include <QString>
 
-class TodoItem {
+class TaskItem {
    public:
 	int id;				  // ID
 	QString title;		  // 标题
@@ -16,7 +16,7 @@ class TodoItem {
 	QDateTime deadline;	  // 截止日期
 
 	// 构造函数
-	TodoItem(int id = -1, const QString& title = "",
+	TaskItem(int id = -1, const QString& title = "",
 			 const QString& description = "", bool completed = false,
 			 const QString& category = "", int priority = 0,
 			 const QDateTime& deadline = QDateTime());

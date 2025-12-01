@@ -1,7 +1,7 @@
-#include "todoitem.h"
+#include "taskitem.h"
 
 // 构造函数实现
-TodoItem::TodoItem(int id, const QString& title, const QString& description,
+TaskItem::TaskItem(int id, const QString& title, const QString& description,
 				   bool completed, const QString& category, int priority,
 				   const QDateTime& deadline)
 	: id(id),

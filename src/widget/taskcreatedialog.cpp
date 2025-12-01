@@ -1,27 +1,26 @@
-#include "todocreatedialog.h"
-
 #include <QMessageBox>
 
-#include "ui_todocreatedialog.h"
+#include "taskcreatedialog.h"
+#include "ui_taskcreatedialog.h"
 
-TodoCreateDialog::TodoCreateDialog(QWidget* parent)
-	: QDialog(parent), ui(new Ui::TodoCreateDialog) {
+TaskCreateDialog::TaskCreateDialog(QWidget* parent)
+	: QDialog(parent), ui(new Ui::TaskCreateDialog) {
 	ui->setupUi(this);
 	ui->deadlineInput->setDateTime(QDateTime::currentDateTime());
 
 	connect(ui->okButton, &QPushButton::clicked, this,
-			&TodoCreateDialog::onOkClicked);
+			&TaskCreateDialog::onOkClicked);
 	connect(ui->cancelButton, &QPushButton::clicked, this,
-			&TodoCreateDialog::onCancelClicked);
+			&TaskCreateDialog::onCancelClicked);
 	connect(ui->clearButton, &QPushButton::clicked, this,
-			&TodoCreateDialog::onClearClicked);
+			&TaskCreateDialog::onClearClicked);
 }
 
-TodoCreateDialog::~TodoCreateDialog() { delete ui; }
+TaskCreateDialog::~TaskCreateDialog() { delete ui; }
 
-TodoItem TodoCreateDialog::getTodoItem() const { return m_todoItem; }
+TaskItem TaskCreateDialog::getTaskItem() const { return m_todoItem; }
 
-void TodoCreateDialog::onOkClicked() {
+void TaskCreateDialog::onOkClicked() {
 	QString title = ui->titleInput->text().trimmed();
 	QString description = ui->descriptionInput->toPlainText().trimmed();
 	QString category = ui->categoryInput->text().trimmed();
@@ -34,13 +33,13 @@ void TodoCreateDialog::onOkClicked() {
 	}
 
 	m_todoItem =
-		TodoItem(-1, title, description, false, category, priority, deadline);
+		TaskItem(-1, title, description, false, category, priority, deadline);
 	accept();
 }
 
-void TodoCreateDialog::onCancelClicked() { reject(); }
+void TaskCreateDialog::onCancelClicked() { reject(); }
 
-void TodoCreateDialog::onClearClicked() {
+void TaskCreateDialog::onClearClicked() {
 	ui->titleInput->clear();
 	ui->descriptionInput->clear();
 	ui->categoryInput->clear();

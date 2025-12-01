@@ -1,57 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TodoDetailDialog</class>
- <widget class="QDialog" name="TodoDetailDialog">
+ <class>TaskCreateDialog</class>
+ <widget class="QDialog" name="TaskCreateDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>450</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>待办事项详情</string>
+   <string>创建待办事项</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QCheckBox" name="statusInput">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="titleInput">
-       <property name="placeholderText">
-        <string>标题</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>分类:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="categoryInput"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>优先:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
       <widget class="QComboBox" name="priorityInput">
        <item>
         <property name="text">
@@ -70,14 +35,14 @@
        </item>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>截止:</string>
+     <item>
+      <widget class="QLineEdit" name="categoryInput">
+       <property name="placeholderText">
+        <string>分类</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item>
       <widget class="QDateTimeEdit" name="deadlineInput">
        <property name="displayFormat">
         <string>yyyy-MM-dd HH:mm</string>
@@ -90,14 +55,25 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextEdit" name="descriptionInput"/>
+    <widget class="QLineEdit" name="titleInput">
+     <property name="placeholderText">
+      <string>标题</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="descriptionInput">
+     <property name="placeholderText">
+      <string>描述</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="buttonLayout">
      <item>
-      <widget class="QPushButton" name="updateButton">
+      <widget class="QPushButton" name="clearButton">
        <property name="text">
-        <string>修改</string>
+        <string>清空</string>
        </property>
       </widget>
      </item>
@@ -117,7 +93,14 @@
      <item>
       <widget class="QPushButton" name="cancelButton">
        <property name="text">
-        <string>返回</string>
+        <string>取消</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="okButton">
+       <property name="text">
+        <string>确定</string>
        </property>
       </widget>
      </item>

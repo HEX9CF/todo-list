@@ -4,7 +4,7 @@
 #include <QList>
 #include <QSqlDatabase>
 
-#include "../model/todoitem.h"
+#include "../model/taskitem.h"
 
 class DatabaseManager {
    public:
@@ -13,11 +13,11 @@ class DatabaseManager {
 	void closeDatabase();
 	bool initTable();
 
-	bool addTodo(TodoItem& item);
-	bool removeTodo(int id);
-	bool updateTodo(const TodoItem& item);
-	QList<TodoItem> getAllTodos();
-	QList<TodoItem> searchTodos(const QString& query);
+	bool addTask(TaskItem& item);
+	bool removeTask(int id);
+	bool updateTask(const TaskItem& item);
+	QList<TaskItem> getAllTasks();
+	QList<TaskItem> searchTasks(const QString& query);
 
    private:
 	DatabaseManager();

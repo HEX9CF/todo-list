@@ -5,8 +5,8 @@
 #include <QMainWindow>
 #include <QTableWidgetItem>
 
-#include "../model/todoitem.h"
-#include "todocreatedialog.h"
+#include "../model/taskitem.h"
+#include "taskcreatedialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow {
 
    private:
 	Ui::MainWindow* ui;	 // UI 指针
-	QList<TodoItem> m_todoItems;
+	QList<TaskItem> m_todoItems;
 	QString m_currentCategoryFilter;
 	bool m_isAscending = true;
 	int m_completedFilterIndex = 0;	 // 0: 全部, 1: 未完成, 2: 已完成
