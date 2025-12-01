@@ -18,7 +18,7 @@ DatabaseManager::~DatabaseManager() { closeDatabase(); }
 bool DatabaseManager::openDatabase() {
 	m_db = QSqlDatabase::addDatabase("QSQLITE");
 
-	// Store database in a standard location
+	// 将数据库存储在标准位置
 	QString path =
 		QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 	QDir dir(path);

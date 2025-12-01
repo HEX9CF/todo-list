@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow {
 	void onDeleteClicked();
 	void onSearchClicked();
 	void onSortByChanged(int index);
+	void onSortOrderClicked();
 	void onCategorySelected(QListWidgetItem* item);
 	void onItemChanged(QTableWidgetItem* item);
 	void onItemDoubleClicked(int row, int column);
@@ -35,6 +36,7 @@ class MainWindow : public QMainWindow {
 	Ui::MainWindow* ui;	 // UI 指针
 	QList<TodoItem> m_todoItems;
 	QString m_currentCategoryFilter;
+	bool m_isAscending = true;
 
 	void loadData();
 	void refreshTableWidget();
