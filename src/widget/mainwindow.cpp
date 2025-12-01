@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget* parent)
 			&MainWindow::onDeleteClicked);
 	connect(ui->searchButton, &QPushButton::clicked, this,
 			&MainWindow::onSearchClicked);
+	connect(ui->resetFilterButton, &QPushButton::clicked, this,
+			&MainWindow::onResetFilterClicked);
 	connect(ui->searchLineEdit, &QLineEdit::returnPressed, this,
 			&MainWindow::onSearchClicked);
 	connect(ui->sortByComboBox,
@@ -189,6 +191,17 @@ void MainWindow::onSearchClicked() {
 		refreshCategoryList();
 		refreshTableWidget();
 	}
+}
+
+void MainWindow::onResetFilterClicked() {
+	ui->searchLineEdit->clear();
+	ui->completedComboBox->setCurrentIndex(0);
+	ui->expiredComboBox->setCurrentIndex(0);
+	ui->sortByComboBox->setCurrentIndex(0);
+	m_isAscending = true;
+	ui->sortOrderButton->setText("↑");
+	m_currentCategoryFilter.clear();
+	loadData();
 }
 
 void MainWindow::onSortByChanged(int index) {

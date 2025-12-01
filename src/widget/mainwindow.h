@@ -26,6 +26,7 @@ class MainWindow : public QMainWindow {
 	void onCopyClicked();
 	void onDeleteClicked();
 	void onSearchClicked();
+	void onResetFilterClicked();
 	void onSortByChanged(int index);
 	void onSortOrderClicked();
 	void onCategorySelected(QListWidgetItem* item);
