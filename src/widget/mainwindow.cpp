@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget* parent)
 			&MainWindow::onSearchClicked);
 	connect(ui->searchLineEdit, &QLineEdit::returnPressed, this,
 			&MainWindow::onSearchClicked);
+	connect(ui->sortByComboBox,
+			QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+			&MainWindow::onSortByChanged);
 	connect(ui->categoryListWidget, &QListWidget::itemClicked, this,
 			&MainWindow::onCategorySelected);
 	connect(ui->todoTableWidget, &QTableWidget::itemChanged, this,
@@ -114,7 +117,7 @@ void MainWindow::onCopyClicked() {
 
 		if (found) {
 			TodoItem newItem = originalItem;
-			newItem.id = -1;			 // Reset ID so DB assigns a new one
+			newItem.id = -1;  // Reset ID so DB assigns a new one
 
 			if (DatabaseManager::instance().addTodo(newItem)) {
 				m_todoItems.append(newItem);
@@ -175,9 +178,43 @@ void MainWindow::onSearchClicked() {
 		loadData();
 	} else {
 		m_todoItems = DatabaseManager::instance().searchTodos(searchText);
+		onSortByChanged(ui->sortByComboBox->currentIndex());  // Apply sort
 		refreshCategoryList();
 		refreshTableWidget();
 	}
+}
+
+void MainWindow::onSortByChanged(int index) {
+	switch (index) {
+		case 0:	 // ID
+			std::sort(m_todoItems.begin(), m_todoItems.end(),
+					  [](const TodoItem& a, const TodoItem& b) {
+						  return a.id < b.id;
+					  });
+			break;
+		case 1:	 // Title
+			std::sort(m_todoItems.begin(), m_todoItems.end(),
+					  [](const TodoItem& a, const TodoItem& b) {
+						  return a.title < b.title;
+					  });
+			break;
+		case 2:	 // Priority (High to Low: 2 > 1 > 0)
+			std::sort(m_todoItems.begin(), m_todoItems.end(),
+					  [](const TodoItem& a, const TodoItem& b) {
+						  return a.priority > b.priority;
+					  });
+			break;
+		case 3:	 // Deadline (Earliest first)
+			std::sort(m_todoItems.begin(), m_todoItems.end(),
+					  [](const TodoItem& a, const TodoItem& b) {
+						  if (!a.deadline.isValid())
+							  return false;	 // Invalid last
+						  if (!b.deadline.isValid()) return true;
+						  return a.deadline < b.deadline;
+					  });
+			break;
+	}
+	refreshTableWidget();
 }
 
 void MainWindow::onCategorySelected(QListWidgetItem* item) {
@@ -239,6 +276,7 @@ void MainWindow::onItemDoubleClicked(int row, int column) {
 
 void MainWindow::loadData() {
 	m_todoItems = DatabaseManager::instance().getAllTodos();
+	onSortByChanged(ui->sortByComboBox->currentIndex());  // Apply sort
 	refreshCategoryList();
 	refreshTableWidget();
 }

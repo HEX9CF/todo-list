@@ -22,7 +22,7 @@
         <item>
          <widget class="QLineEdit" name="searchLineEdit">
           <property name="placeholderText">
-           <string>任务名称或描述...</string>
+           <string>任务标题或描述...</string>
           </property>
          </widget>
         </item>
@@ -34,6 +34,54 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QComboBox" name="sortByComboBox">
+          <item>
+           <property name="text">
+            <string>按ID排序</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>按标题排序</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>按优先级排序</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>按截止日期排序</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="sortDescButton">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QListWidget" name="categoryListWidget"/>
