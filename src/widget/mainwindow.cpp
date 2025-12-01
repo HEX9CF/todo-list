@@ -13,6 +13,10 @@ MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow) {
 	ui->setupUi(this);	// 设置 UI 界面
 
+	// Set stretch factors for horizontal layout (1:3)
+	ui->horizontalLayout->setStretch(0, 1);
+	ui->horizontalLayout->setStretch(1, 3);
+
 	// Setup Table
 	ui->todoTableWidget->setColumnCount(5);
 	QStringList headers;
