@@ -31,12 +31,16 @@ class MainWindow : public QMainWindow {
 	void onCategorySelected(QListWidgetItem* item);
 	void onItemChanged(QTableWidgetItem* item);
 	void onItemDoubleClicked(int row, int column);
+	void onCompletedFilterChanged(int index);
+	void onExpiredFilterChanged(int index);
 
    private:
 	Ui::MainWindow* ui;	 // UI 指针
 	QList<TodoItem> m_todoItems;
 	QString m_currentCategoryFilter;
 	bool m_isAscending = true;
+	int m_completedFilterIndex = 0;	 // 0: 全部, 1: 未完成, 2: 已完成
+	int m_expiredFilterIndex = 0;	 // 0: 全部, 1: 未过期, 2: 已过期
 
 	void loadData();
 	void refreshTableWidget();

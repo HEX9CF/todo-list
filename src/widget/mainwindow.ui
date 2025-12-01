@@ -38,6 +38,44 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
+         <widget class="QComboBox" name="completedComboBox">
+          <item>
+           <property name="text">
+            <string>完成情况</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>未完成</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>已完成</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="expiredComboBox">
+          <item>
+           <property name="text">
+            <string>过期情况</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>未过期</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>已过期</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
          <widget class="QComboBox" name="sortByComboBox">
           <item>
            <property name="text">

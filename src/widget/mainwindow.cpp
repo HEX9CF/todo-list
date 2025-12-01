@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget* parent)
 	// 设置表格
 	ui->todoTableWidget->setColumnCount(4);
 	QStringList headers;
-	headers << "完成" << "标题" << "优先级" << "截止日期";
+	headers << " " << "标题" << "优先" << "截止日期";
 	ui->todoTableWidget->setHorizontalHeaderLabels(headers);
 
 	// 设置列调整模式
@@ -57,6 +57,12 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui->sortByComboBox,
 			QOverload<int>::of(&QComboBox::currentIndexChanged), this,
 			&MainWindow::onSortByChanged);
+	connect(ui->completedComboBox,
+			QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+			&MainWindow::onCompletedFilterChanged);
+	connect(ui->expiredComboBox,
+			QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+			&MainWindow::onExpiredFilterChanged);
 	connect(ui->sortOrderButton, &QPushButton::clicked, this,
 			&MainWindow::onSortOrderClicked);
 	connect(ui->categoryListWidget, &QListWidget::itemClicked, this,
@@ -286,6 +292,16 @@ void MainWindow::onItemDoubleClicked(int row, int column) {
 	}
 }
 
+void MainWindow::onCompletedFilterChanged(int index) {
+	m_completedFilterIndex = index;
+	refreshTableWidget();
+}
+
+void MainWindow::onExpiredFilterChanged(int index) {
+	m_expiredFilterIndex = index;
+	refreshTableWidget();
+}
+
 void MainWindow::loadData() {
 	m_todoItems = DatabaseManager::instance().getAllTodos();
 	onSortByChanged(ui->sortByComboBox->currentIndex());  // 应用排序
@@ -315,10 +331,31 @@ void MainWindow::refreshTableWidget() {
 	ui->todoTableWidget->setRowCount(0);  // 清空表格
 
 	int row = 0;
+	QDateTime currentDateTime = QDateTime::currentDateTime();
+
 	for (const auto& item : m_todoItems) {
+		// 分类筛选
 		if (!m_currentCategoryFilter.isEmpty() &&
 			item.category != m_currentCategoryFilter) {
 			continue;
+		}
+
+		// 完成状态筛选
+		// 1: 未完成, 2: 已完成
+		if (m_completedFilterIndex == 1 && item.completed) continue;
+		if (m_completedFilterIndex == 2 && !item.completed) continue;
+
+		// 过期状态筛选
+		// 1: 未过期, 2: 已过期
+		if (m_expiredFilterIndex == 1) {
+			// 显示未过期：跳过已过期的（有截止日期且小于当前时间）
+			if (item.deadline.isValid() && item.deadline < currentDateTime)
+				continue;
+		}
+		if (m_expiredFilterIndex == 2) {
+			// 显示已过期：跳过未过期的（无截止日期或大于等于当前时间）
+			if (!item.deadline.isValid() || item.deadline >= currentDateTime)
+				continue;
 		}
 
 		ui->todoTableWidget->insertRow(row);
